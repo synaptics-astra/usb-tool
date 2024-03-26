@@ -1,0 +1,147 @@
+;
+; Copyright (C) 2022 Synaptics Incorporated, All Rights Reserved.
+;
+
+[Version]
+Signature = "$Windows NT$"
+Class = USB
+ClassGUID ={36FC9E60-C465-11CF-8056-444553540000}
+Provider = %ProviderName%
+CatalogFile = SYNA_WinUSB.cat
+DriverVer = 12/06/2023,3.0.0.0
+PnpLockDown = 1
+
+
+; ========== Manufacturer/Models sections ===========
+
+[Manufacturer]
+%ProviderName% = Synaptics_WinUSB,NTx86,NTamd64,NTia64
+
+[Synaptics_WinUSB.NTx86]
+%USB\VID_06CB&PID_00AE.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00AE
+%USB\VID_06CB&PID_00AF.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00AF
+%USB\VID_06CB&PID_00B0.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B0
+%USB\VID_06CB&PID_00B1.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B1
+%USB\VID_06CB&PID_00B2.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B2
+
+[Synaptics_WinUSB.NTamd64]
+%USB\VID_06CB&PID_00AE.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00AE
+%USB\VID_06CB&PID_00AF.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00AF
+%USB\VID_06CB&PID_00B0.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B0
+%USB\VID_06CB&PID_00B1.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B1
+%USB\VID_06CB&PID_00B2.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B2
+
+[Synaptics_WinUSB.NTia64]
+%USB\VID_06CB&PID_00AE.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00AE
+%USB\VID_06CB&PID_00AF.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00AF
+%USB\VID_06CB&PID_00B0.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B0
+%USB\VID_06CB&PID_00B1.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B1
+%USB\VID_06CB&PID_00B2.DeviceDesc%=USB_Install, USB\VID_06CB&PID_00B2
+; =================== Installation ===================
+
+;[1]
+[USB_Install]
+Include=Winusb.inf
+Needs=WINUSB.NT
+
+;[2]
+[USB_Install.Services]
+Include=winusb.inf
+Needs=WINUSB.NT.Services
+AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
+
+[WinUSB_ServiceInstall]
+DisplayName     = %SYNA_WinUSB_SvcDesc%
+ServiceType     = 1
+StartType       = 3
+ErrorControl    = 1
+ServiceBinary   = %12%\WinUSB.sys;
+
+;[3]
+[USB_Install.Wdf]
+KmdfService=WINUSB, WinUSB_Install
+UmdfDispatcher=WinUsb
+UmdfServiceOrder=WINUSB
+
+
+[WinUSB_Install]
+KmdfLibraryVersion=1.9
+
+;[4]
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,"{D696BFEB-1734-417d-8A04-86D01071C512}"
+
+
+;[5]
+[USB_Install.CoInstallers]
+AddReg=CoInstallers_AddReg
+CopyFiles=CoInstallers_CopyFiles
+
+[CoInstallers_AddReg]
+
+HKR,,CoInstallers32,0x00010000,"WinUSBCoInstaller2.dll","WUDFUpdate_01009.dll","WdfCoInstaller01009.dll,WdfCoInstaller"
+
+[CoInstallers_CopyFiles]
+WinUSBCoInstaller2.dll
+WdfCoInstaller01009.dll
+WUDFUpdate_01009.dll
+
+
+
+; ================= Source Media Section =====================
+;[7]
+;[SourceDisksNames]
+;1 = %DISK_NAME%,,,\x86
+;2 = %DISK_NAME%,,,\amd64
+;3 = %DISK_NAME%,,,\ia64
+
+[SourceDisksNames.x86]
+1 = %DISK_NAME%,,,\x86
+
+[SourceDisksNames.amd64]
+2 = %DISK_NAME%,,,\amd64
+
+[SourceDisksNames.ia64]
+3 = %DISK_NAME%,,,\ia64
+
+[SourceDisksFiles.x86]
+WinUSBCoInstaller2.dll=1
+WdfCoInstaller01009.dll=1
+WUDFUpdate_01009.dll=1
+
+[SourceDisksFiles.amd64]
+WinUSBCoInstaller2.dll=2
+WdfCoInstaller01009.dll=2
+WUDFUpdate_01009.dll=2
+
+[SourceDisksFiles.ia64]
+WinUSBCoInstaller2.dll=3
+WdfCoInstaller01009.dll=3
+WUDFUpdate_01009.dll=3
+
+
+
+;************************************************* *****************************
+; Destination Directories
+;------------------------------------------------------------------------------
+[DestinationDirs]
+DefaultDestDir = 12 ; %SystemRoot%\system32\drivers
+_CopyFiles_sys = 12
+
+; =================== Strings ===================
+
+[Strings]
+ProviderName="SYNA_WinUSB_Release"
+USB\VID_06CB&PID_00AE.DeviceDesc="Synaptics IoT: Tools package USB Driver for Synaptics Processors"
+USB\VID_06CB&PID_00AF.DeviceDesc="Synaptics IoT: Tools package USB Driver for Synaptics Processors"
+USB\VID_06CB&PID_00B0.DeviceDesc="Synaptics IoT: Tools package USB Driver for Synaptics Processors"
+USB\VID_06CB&PID_00B1.DeviceDesc="Synaptics IoT: Tools package USB Driver for Synaptics Processors"
+USB\VID_06CB&PID_00B2.DeviceDesc="Synaptics IoT: Tools package USB Driver for Synaptics Processors"
+
+SYNA_WinUSB_SvcDesc="Synaptics: USB Host Driver"
+DISK_NAME="InstallDisk"
+ClassName="SYNA_WinUSB_Class"
+
