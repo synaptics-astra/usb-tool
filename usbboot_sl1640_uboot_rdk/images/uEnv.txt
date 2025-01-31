@@ -1,0 +1,1 @@
+bootcmd=l2emmc eMMCimg; reset
