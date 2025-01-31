@@ -6,7 +6,9 @@ Based on U-Boot mainline version: U-Boot-2019.10
 
 ## 2. Change Log
 ### U-Boot-2019.10-Astra-v1.2.0
-enable usb console and uEnv.txt
+General:
+
+	- Enable USB console and uEnv.txt
 
 ### U-Boot-2019.10-Astra-v1.1.1
 General:
