@@ -2,7 +2,7 @@
 
 ## 1. Information
 
-Base on U-Boot mainline version: U-Boot-2019.10
+Based on U-Boot mainline version: U-Boot-2019.10
 
 ## 2. Change Log
 ### U-Boot-2019.10-Astra-v1.2.0
@@ -10,6 +10,7 @@ enable usb console and uEnv.txt
 
 ### U-Boot-2019.10-Astra-v1.1.1
 General:
+
 	- Update keys for OPTEE
 
 ### U-Boot-2019.10-Astra-v1.1.0
@@ -19,6 +20,7 @@ Fastboot:
 	- Add "flash ram" to download files into memory
 
 General:
+
 	- Support eMMC quick fill while upgrading sparse images
 
 ### U-Boot-2019.10-Astra-v1.0.1
