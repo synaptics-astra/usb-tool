@@ -12,6 +12,10 @@ if [[ "${HOST_OS}" == "Darwin" ]]; then
 	else
 		USB_BOOT_BIN_PATH="./bin/mac/x86_64"
 	fi
+elif [[ "${HOST_OS}" == "Linux" ]]; then
+    if [[ "${HOST_ARCH}" == "aarch64" ]]; then
+        USB_BOOT_BIN_PATH="./bin/linux/arm64"
+    fi
 fi
 
 # sudo required to access USB devices and semaphores
