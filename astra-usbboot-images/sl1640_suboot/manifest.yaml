@@ -1,0 +1,11 @@
+id: 910997ec-04cc-11f0-94aa-00155d2dc74c
+chip: sl1640
+board: rdk
+secure_boot: genx
+vendor_id: 06CB
+product_id: 00B0
+console: uart
+uenv_support: true
+memory_layout: 2gb
+uboot: suboot
+uboot_version: 202503142302
