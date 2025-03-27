@@ -8,4 +8,4 @@ console: uart
 uenv_support: true
 memory_layout: 4gb
 uboot: suboot
-uboot_version: 202503142302
+uboot_version: "U-Boot 2019.10.202503261618_202503261956-gef520b048c-dirty (Mar 24 2025 - 16:56:36 +0000)"
