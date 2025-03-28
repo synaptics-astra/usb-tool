@@ -1,0 +1,11 @@
+id: 3ca41e36-ca2d-11ef-97c5-2787cd19f670
+chip: sl1680
+board: rdk
+secure_boot: genx
+vendor_id: 06CB
+product_id: 00B1
+console: usb
+uenv_support: true
+memory_layout: 4gb
+uboot: uboot
+uboot_version: v1.2

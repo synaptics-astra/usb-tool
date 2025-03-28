@@ -1,0 +1,11 @@
+id: e75740fa-04e9-11f0-856a-00155d2dc74c
+chip: sl1620
+board: rdk
+secure_boot: genx
+vendor_id: 06CB
+product_id: 00B2
+console: uart
+uenv_support: true
+memory_layout: 2gb
+uboot: suboot
+uboot_version: "U-Boot 2019.10.202503261618_202503261956-gef520b048c-dirty (Mar 24 2025 - 16:56:36 +0000)"
