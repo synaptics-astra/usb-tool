@@ -7,7 +7,7 @@ USB Driver
 ----------
 
 The ``Synaptics_WinUSB_Driver`` directory contains the Windows USB driver which is needed to communicate with a Synaptics Astra RDK board from a host PC using the USB interface.
-Instructions for installing the USB driver can be found in the `Synaptics Astra Documentation <https://synaptics-astra.github.io/doc/v/1.0.0/linux/index.html#installing-the-winusb-driver-windows-only>`__.
+Instructions for installing the USB driver can be found in the `Synaptics Astra Documentation <https://synaptics-astra.github.io/doc/v/1.6.0/linux/index.html#installing-the-winusb-driver-windows-only>`__.
 
 Astra Update
 ------------
