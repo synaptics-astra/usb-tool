@@ -16,4 +16,6 @@ The ``astra-update`` tool replaces ``usbboot`` as the preferred tool for updatin
 to the usb-tool directory and run either ``update_emmc.bat`` or ``update_spi.bat`` on Windows or ``update_emmc.sh`` or ``update_spi.sh`` on Linux or Mac.
 Instructions for using the tool can be found in the Synaptics Astra Documentation.
 
+The ``astra-update`` source code repository and detailed documentation can be found at the `Astra Update Source Repository <https://github.com/synaptics-astra/astra-update>`__.
+
 Previous versions of ``usbboot`` can be found on the `releases page <https://github.com/synaptics-astra/usb-tool/releases/>`__.
