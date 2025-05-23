@@ -1,4 +1,4 @@
-id: 1e080362-360b-11f0-89a3-0242ac110002
+id: 9930c714-375e-11f0-b558-0242ac110002
 chip: sl1680
 board: rdk
 secure_boot: genx
@@ -8,4 +8,4 @@ console: uart
 uenv_support: true
 memory_layout: 4gb
 uboot: suboot
-uboot_version: "U-Boot 2019.10.202505191045_202505201644-gc153026d04-dirty (Apr 15 2025 - 13:13:31 +0000)"
+uboot_version: "U-Boot 2019.10.202505221539_202505221945-g1581c16241-dirty (May 21 2025 - 15:54:17 +0000)"
