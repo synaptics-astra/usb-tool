@@ -50,6 +50,12 @@ Include=winusb.inf
 Needs=WINUSB.NT.Services
 AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
 
+[USB_Install.AddReg]
+HKLM,"SYSTEM\CurrentControlSet\Control\usbflags\06CB00B00002","IgnoreHWSerNum",0x00000001,01
+HKLM,"SYSTEM\CurrentControlSet\Control\usbflags\06CB00B10002","IgnoreHWSerNum",0x00000001,01
+HKLM,"SYSTEM\CurrentControlSet\Control\usbflags\06CB00B20002","IgnoreHWSerNum",0x00000001,01
+
+
 [WinUSB_ServiceInstall]
 DisplayName     = %SYNA_WinUSB_SvcDesc%
 ServiceType     = 1
