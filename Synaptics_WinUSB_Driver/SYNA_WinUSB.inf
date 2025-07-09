@@ -50,12 +50,6 @@ Include=winusb.inf
 Needs=WINUSB.NT.Services
 AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
 
-[USB_Install.AddReg]
-HKLM,"SYSTEM\CurrentControlSet\Control\usbflags\06CB00B00000","IgnoreHWSerNum",0x00000001,01
-HKLM,"SYSTEM\CurrentControlSet\Control\usbflags\06CB00B10000","IgnoreHWSerNum",0x00000001,01
-HKLM,"SYSTEM\CurrentControlSet\Control\usbflags\06CB00B20000","IgnoreHWSerNum",0x00000001,01
-
-
 [WinUSB_ServiceInstall]
 DisplayName     = %SYNA_WinUSB_SvcDesc%
 ServiceType     = 1
@@ -79,7 +73,9 @@ AddReg=Dev_AddReg
 
 [Dev_AddReg]
 HKR,,DeviceInterfaceGUIDs,0x10000,"{D696BFEB-1734-417d-8A04-86D01071C512}"
-
+HKLM,SYSTEM\CurrentControlSet\Control\usbflags\06CB00B00000,IgnoreHWSerNum,0x00000001,01
+HKLM,SYSTEM\CurrentControlSet\Control\usbflags\06CB00B10000,IgnoreHWSerNum,0x00000001,01
+HKLM,SYSTEM\CurrentControlSet\Control\usbflags\06CB00B20000,IgnoreHWSerNum,0x00000001,01
 
 ;[5]
 [USB_Install.CoInstallers]
