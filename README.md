@@ -1,5 +1,10 @@
 # USB Boot Utility for SL261x
 
+> [!IMPORTANT]
+> This tool is only for SL261x.
+> For SL16x0 see https://github.com/synaptics-astra/usb-tool/tree/main.
+
+
 ## Overview
 
 The USB Boot Utility is a Python-based command-line tool used for:
