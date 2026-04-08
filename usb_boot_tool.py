@@ -21,7 +21,7 @@ from serial.tools import list_ports
 # Serial Defaults
 DEFAULT_BAUD            = 230400
 DEFAULT_TIMEOUT         = 2.0
-EMMC_OP_TIMEOUT         = 240.0
+EMMC_OP_TIMEOUT         = 1500.0
 
 # Protocol Constants
 HOST_SYNC1              = 0x5B
@@ -84,7 +84,7 @@ USB_CDC_SM              = 1
 usb_cdc_port_default    = [[(0x06CB, 0x019E)], [(0xCAFE, 0x4002)]]
 
 def _log(level, msg):
-    print(f"[{level}] {msg}")
+    print(f"[{level}] {msg}", flush=True)
 
 def log_info(msg):  _log("INFO", msg)
 def log_error(msg): _log("ERROR", msg)
@@ -181,12 +181,12 @@ def auto_detect_usb_cdc_port(vid_pid_pairs: Optional[Iterable[Tuple[Union[int, s
             pn = _normalize_id_list([p])[0]
             pairs_n.append((vn, pn))
             formatted = ", ".join(f"VID:0x{vid:04X}, PID:0x{pid:04X}" for vid, pid in pairs_n)
-            print(f"Auto-detecting {formatted} serial port...")
+            print(f"Auto-detecting {formatted} serial port...", flush=True)
     else:
-        print("Auto-detecting serial port...")
+        print("Auto-detecting serial port...", flush=True)
 
     detected = find_cdc_port(vid_pid_pairs=vid_pid_pairs, wait_seconds=10)
-    print("Syna USB CDC port detected:", detected)
+    print("Syna USB CDC port detected:", detected, flush=True)
     if detected:
         return detected
     else:
@@ -195,15 +195,19 @@ def auto_detect_usb_cdc_port(vid_pid_pairs: Optional[Iterable[Tuple[Union[int, s
 def pack_spk_cmd(ser, op, payload):
     """Pack and send SPK command."""
     header = struct.pack("<BBBBIIIIIII", 0x5B, 0x5A, 0x33, op, len(payload), 0, 0,0,0,0,0)
+    ser.reset_input_buffer()
+    ser.reset_output_buffer()
+    time.sleep(0.1)
     ser.write(header + payload)
+    ser.flush()
     resp = ser.read(HOST_HDR_SIZE)
     if len(resp) != 8:
-        print(" ERROR: No or incomplete response")
+        print(" ERROR: No or incomplete response", flush=True)
         return False
     _, _, srv, opc, rc0, rc1, rc2, rc3 = resp
     rc = rc0 | (rc1<<8) | (rc2<<16) | (rc3<<24)
     if rc != 0:
-        print(" Transfer returned error")
+        print(" Transfer returned error", flush=True)
         return False
     return True
 
@@ -215,15 +219,14 @@ def upload_file(ser_port, op, ser_baud, input_file):
         payload = f.read()
         ok = pack_spk_cmd(ser, op, payload)
         if not ok:
-            print("\n Upload stopped due to error\n")
+            print("\n Upload stopped due to error\n", flush=True)
             return
         elapsed = time.time() - start
         speed = size / 1024 / 1024 / elapsed
-        print(f" ✔  {os.path.basename(input_file)} UPLOADED ({elapsed:.2f}s @ {speed:.2f}MB/s)")
+        print(f" ✔   {os.path.basename(input_file)} UPLOADED ({elapsed:.2f}s @ {speed:.2f}MB/s)", flush=True)
 
 def gunzip_if_needed(path):
     if path.endswith(".gz"):
-        # Remove .gz
         dst = path[:-3]
         log_info(f"Auto-Decompressing {os.path.basename(path)} -> {os.path.basename(dst)}")
         try:
@@ -252,15 +255,15 @@ def resolve_file_path(path):
 
     return None
 
-def print_progress(iteration, total, prefix='', suffix='', decimals=1, length=40, fill='#'):
-    if total == 0: return
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    if iteration == total:
-        sys.stdout.write(f'\r{prefix} |{bar}| {percent}% {suffix}\n')
+def print_progress_bar(percent, final=False):
+    bar_len = 20
+    filled = int(bar_len * percent / 100)
+    bar = "#" * filled + "-" * (bar_len - filled)
+
+    if final:
+        print("#" * bar_len + " 100.0% Complete")
     else:
-        sys.stdout.write(f'\r{prefix} |{bar}| {percent}% {suffix}')
+        sys.stdout.write("\r" + bar)
     sys.stdout.flush()
 
 def parse_image_list_to_map(path):
@@ -273,9 +276,6 @@ def parse_image_list_to_map(path):
                 if len(parts) >= 2 and not line.strip().startswith("#"):
                     filename = parts[0]
                     target   = parts[1].lower()
-
-                    if "rootfs_s.subimg" in filename:
-                        filename = "rootfs.subimg.gz"
 
                     if target not in action_map:
                         action_map[target] = []
@@ -412,7 +412,10 @@ class DeviceHandler:
         if timeout:
             old_timeout = self.ser.timeout
             self.ser.timeout = timeout
-            
+
+        self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer()
+        time.sleep(0.1)
         self.ser.write(final_packet)
         self.ser.flush()
 
@@ -438,11 +441,11 @@ class DeviceHandler:
                 rc = 0 
         return rc
 
-def send_emmc_cmd_manual(dev, subcmd, param1, param2, timeout=DEFAULT_TIMEOUT, delay_sec=0.1):
+def send_emmc_cmd_manual(dev, subcmd, param1, param2, param3=0, timeout=DEFAULT_TIMEOUT, delay_sec=0.1):
     dev.ser.reset_input_buffer()
 
     inner_hdr = struct.pack("<BBBB I I I I I I I",
-        HOST_SYNC1, HOST_SYNC2, SERVICE_ID_BOOT, OPCODE_EMMC_OP, 0, subcmd, param1, param2, 0, 0, 0)
+        HOST_SYNC1, HOST_SYNC2, SERVICE_ID_BOOT, OPCODE_EMMC_OP, 0, subcmd, param1, param2, param3, 0, 0)
     
     packet = inner_hdr
     if not dev.raw_mode:
@@ -452,6 +455,10 @@ def send_emmc_cmd_manual(dev, subcmd, param1, param2, timeout=DEFAULT_TIMEOUT, d
     if timeout:
         old_timeout = dev.ser.timeout
         dev.ser.timeout = timeout
+
+    dev.ser.reset_input_buffer()
+    dev.ser.reset_output_buffer()
+    time.sleep(0.1)
     dev.ser.write(packet)
     dev.ser.flush()
     resp_hdr = dev.ser.read(HOST_HDR_SIZE)
@@ -478,13 +485,10 @@ def send_emmc_cmd_manual(dev, subcmd, param1, param2, timeout=DEFAULT_TIMEOUT, d
         time.sleep(delay_sec)
     return rc
 
-def op_upload_file(dev, file_path, addr, img_type=IMG_TYPE_GENERIC, chunk_size=None):
+def op_upload_file(dev, file_path, addr, img_type=IMG_TYPE_GENERIC, chunk_size=None, show_progress=True):
     size = os.path.getsize(file_path)
-    filename = os.path.basename(file_path)
 
     if chunk_size is None: chunk_size = STREAM_CHUNK_SIZE
-    
-    log_info(f"Upload {filename} ({size} bytes) to 0x{addr:X}...")
 
     rc = dev.send_packet(SERVICE_ID_BOOT, OPCODE_UPLOAD, payload=b"", 
                          host_opcode=HOST_API_OPCODE_GENERIC,
@@ -499,24 +503,31 @@ def op_upload_file(dev, file_path, addr, img_type=IMG_TYPE_GENERIC, chunk_size=N
         log_error(f"Setup Failed. FW returned RC=0x{rc:X}")
         return False
 
-    t_start = time.perf_counter()
     with open(file_path, "rb") as f:
         sent = 0
-        print_progress(0, size, prefix='Tx:', suffix='Complete', length=40)
-        
+        last_percent = -1
+        dev.ser.reset_input_buffer()
+        dev.ser.reset_output_buffer()
+        time.sleep(0.1)
+
         while True:
             chunk = f.read(chunk_size)
             if not chunk: break
 
             dev.ser.write(chunk)
             dev.ser.flush()
-            
+
             sent += len(chunk)
-            print_progress(sent, size, prefix='Tx:', suffix='Complete', length=40)
+            percent = int((sent * 100) / size)
 
-    sys.stdout.write('\n')
-
-    log_info("Data sent. Waiting for verification...")
+            if show_progress:
+                if percent != last_percent:
+                    print_progress_bar(percent)
+                    last_percent = percent
+    
+    if show_progress:
+        print_progress_bar(100, final=True)
+        sys.stdout.write('\n')
     
     try:
         old_timeout = dev.ser.timeout
@@ -554,19 +565,26 @@ def op_upload_file(dev, file_path, addr, img_type=IMG_TYPE_GENERIC, chunk_size=N
         log_error(f"Exception during final ACK read: {e}")
         return False
 
-    duration = time.perf_counter() - t_start
-    log_info(f"Upload Done: {duration:.4f}s ({size/1024/duration:.2f} KB/s)")
     return True
 
+def is_file_sparse(filepath):
+    SPARSE_HEADER_MAGIC = 0xED26FF3A
+    try:
+        if os.path.getsize(filepath) < 4:
+            return False
+        with open(filepath, 'rb') as f:
+            magic_data = f.read(4)
+            magic = struct.unpack('<I', magic_data)[0]
+            return magic == SPARSE_HEADER_MAGIC
+    except Exception as e:
+        return False
 
-def op_upload_and_flash_chunked(dev, file_path, start_lba, img_type=IMG_TYPE_GENERIC, chunk_size_mb=CHUNK_SIZE_MB):
+def op_upload_and_flash_chunked(dev, file_path, start_lba, part_size_sectors, img_type=IMG_TYPE_GENERIC, chunk_size_mb=CHUNK_SIZE_MB):
     file_size = os.path.getsize(file_path)
     chunk_size_bytes = chunk_size_mb * MB_SIZE
+    total_chunks = (file_size + chunk_size_bytes - 1) // chunk_size_bytes
 
-    log_info(
-        f"CHUNKED MODE: {os.path.basename(file_path)} "
-        f"({file_size / MB_SIZE:.2f} MB) in {chunk_size_mb}MB chunks"
-    )
+    is_sparse = is_file_sparse(file_path)
 
     total_blocks_written = 0
     current_lba = start_lba
@@ -584,34 +602,33 @@ def op_upload_and_flash_chunked(dev, file_path, start_lba, img_type=IMG_TYPE_GEN
 
             chunk_blocks = len(chunk_data) // BLOCK_SIZE
 
-            log_info(
-                f"  Chunk {chunk_num}: {chunk_blocks} blocks "
-                f"@ LBA 0x{current_lba:X}"
-            )
+            if is_sparse:
+                flash_lba = start_lba
+            else:
+                flash_lba = current_lba
 
             with tempfile.NamedTemporaryFile(delete=False) as tmp:
                 tmp.write(chunk_data)
                 tmp_path = tmp.name
 
-            if not op_upload_file(dev, tmp_path, ADDR_AC_LOAD, img_type):
+            if not op_upload_file(dev, tmp_path, ADDR_AC_LOAD, img_type, show_progress=False):
                 log_error("Chunk upload failed")
                 os.remove(tmp_path)
                 return 0
 
-            if send_emmc_cmd_manual(dev, 5, current_lba, chunk_blocks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) != 0:
-                log_error("Chunk ERASE failed")
-                os.remove(tmp_path)
-                return 0
-
-            if send_emmc_cmd_manual(dev, 4, current_lba, chunk_blocks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) != 0:
+            if send_emmc_cmd_manual(dev, 4, flash_lba, chunk_blocks, param3=part_size_sectors, timeout=EMMC_OP_TIMEOUT, delay_sec=0.001) != 0:
                 log_error("Chunk WRITE failed")
                 os.remove(tmp_path)
                 return 0
 
-            if send_emmc_cmd_manual(dev, 3, current_lba, chunk_blocks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) != 0:
-                log_error("Chunk READ failed")
-                os.remove(tmp_path)
-                return 0
+            percent = int((chunk_num * 100) / total_chunks)
+            print_progress_bar(percent)
+
+            if not is_sparse:
+                if send_emmc_cmd_manual(dev, 3, flash_lba, chunk_blocks, param3=0, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) != 0:
+                    log_error("Chunk READ failed")
+                    os.remove(tmp_path)
+                    return 0
 
             os.remove(tmp_path)
 
@@ -619,6 +636,7 @@ def op_upload_and_flash_chunked(dev, file_path, start_lba, img_type=IMG_TYPE_GEN
             total_blocks_written += chunk_blocks
             chunk_num += 1
 
+    print_progress_bar(100, final=True)
     return total_blocks_written
 
 def do_run_spk(args):
@@ -661,7 +679,11 @@ def do_version_bl(args):
 
     with DeviceHandler(cdc_port, args.baud, raw_mode=True) as dev:
         op0a_hdr = dev._build_op_header(SERVICE_ID_BOOT, OPCODE_VERSION)
+        dev.ser.reset_input_buffer()
+        dev.ser.reset_output_buffer()
+        time.sleep(0.1)
         dev.ser.write(op0a_hdr)
+        dev.ser.flush()
         time.sleep(0.2)
         resp_hdr = dev.ser.read(HOST_HDR_SIZE)
         if len(resp_hdr) != 8: return
@@ -671,7 +693,7 @@ def do_version_bl(args):
         major = (ver >> 16) & 0xFFFF
         minor = ver & 0xFFFF
 
-        print(f"BL Version: {major}.{minor}")
+        print(f"BL Version: {major}.{minor}", flush=True)
 
 def do_version_sm(args):
     cdc_port = args.port
@@ -685,7 +707,11 @@ def do_version_sm(args):
     with DeviceHandler(cdc_port, args.baud, raw_mode=False) as dev:
         op0a_hdr = dev._build_op_header(SERVICE_ID_BOOT, OPCODE_VERSION)
         host_hdr = dev._build_host_header(HOST_API_SERVICE_ID, HOST_API_OPCODE_VERSION, len(op0a_hdr))
+        dev.ser.reset_input_buffer()
+        dev.ser.reset_output_buffer()
+        time.sleep(0.1)
         dev.ser.write(host_hdr + op0a_hdr)
+        dev.ser.flush()
         time.sleep(0.2)
         resp_hdr = dev.ser.read(HOST_HDR_SIZE)
         if len(resp_hdr) != 8: return
@@ -716,9 +742,17 @@ def do_run_sm(args):
         return
 
     with DeviceHandler(cdc_port, args.baud, raw_mode=True) as dev:
+        log_info("Uploading sysmgr.subimg.gz")
         if op_upload_file(dev, fpath, ADDR_SM_LOAD, IMG_TYPE_SM):
             log_info("Sending RUN (0x0B)...")
-            dev.send_packet(SERVICE_ID_BOOT, OPCODE_RUN_IMG, addr=ADDR_SM_LOAD)
+            try:
+                dev.send_packet(SERVICE_ID_BOOT, OPCODE_RUN_IMG, addr=ADDR_SM_LOAD)
+            except Exception as e:
+                return True
+            log_info("SM started successfully.")
+            return True
+        else:
+            return False
 
 def do_run_acore(args):
     cdc_port = args.port
@@ -740,8 +774,10 @@ def do_run_acore(args):
     if not tzk_path: log_error(f"TZK Not Found: {args.tzk}"); return
 
     with DeviceHandler(cdc_port, args.baud, raw_mode=False) as dev:
+        log_info("Uploading bl.subimg.gz")
         if not op_upload_file(dev, bl_path, ADDR_AC_LOAD, IMG_TYPE_BL): return
         dev.send_packet(SERVICE_ID_BOOT, OPCODE_EXEC_0C, host_opcode=HOST_API_OPCODE_EXEC)
+        log_info("Uploading tzk.subimg.gz")
         if not op_upload_file(dev, tzk_path, ADDR_AC_LOAD, IMG_TYPE_TZK): return
         dev.send_packet(SERVICE_ID_BOOT, OPCODE_EXEC_0C, host_opcode=HOST_API_OPCODE_EXEC)
         log_info("A-Core Sequence Complete.")
@@ -773,7 +809,6 @@ def do_emmc(args):
 
     ops_map = file_defined_map
 
-    log_info("--- PHASE A: FLASHING GPT ---")
     gpt_bin, table_lbas = build_gpt_primary(parts)
     gpt_path = os.path.join(folder, "gpt.bin")
     with open(gpt_path, "wb") as f: f.write(gpt_bin)
@@ -781,6 +816,7 @@ def do_emmc(args):
     LBAS_PER_MB = MB_SIZE // BLOCK_SIZE
 
     with DeviceHandler(cdc_port, args.baud, raw_mode=False) as dev:
+        log_info("Flashing GPT")
         if op_upload_file(dev, gpt_path, ADDR_AC_LOAD, IMG_TYPE_GPT):
             gpt_len_bytes = len(gpt_bin)
             gpt_blocks = (gpt_len_bytes + BLOCK_SIZE - 1) // BLOCK_SIZE
@@ -789,7 +825,6 @@ def do_emmc(args):
             send_emmc_cmd_manual(dev, 5, 0, gpt_blocks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1)
             send_emmc_cmd_manual(dev, 4, 0, gpt_blocks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1)
             send_emmc_cmd_manual(dev, 3, 0, gpt_blocks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1)
-            log_info("GPT Flashed.")
 
         for boot_id in [1, 2]:
             key = f"b{boot_id}"
@@ -799,14 +834,14 @@ def do_emmc(args):
                     if p_path:
                         fsize = os.path.getsize(p_path)
                         fblks = (fsize + BLOCK_SIZE - 1) // BLOCK_SIZE
-                        log_info(f"[{key}] Flashing {fname} to Boot{boot_id}...")
+                        slot = "_a" if boot_id == 1 else "_b"
+                        log_info(f"[b{boot_id}] Flashing {fname} in preboot{slot}")
                         if op_upload_file(dev, p_path, ADDR_AC_LOAD, IMG_TYPE_GPT):
                             send_emmc_cmd_manual(dev, 0, 0, 0, delay_sec=0.2)
                             send_emmc_cmd_manual(dev, 2, boot_id, 0, delay_sec=12.0)
                             send_emmc_cmd_manual(dev, 5, 0, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=3.0)
                             send_emmc_cmd_manual(dev, 4, 0, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=7.0)
                             send_emmc_cmd_manual(dev, 3, 0, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.0)
-                            log_info(f"[{key}] Done.")
 
         prev_end = 0
 
@@ -842,13 +877,19 @@ def do_emmc(args):
                         fsize_mb = fsize / MB_SIZE
 
                         itype = get_image_type_from_name(name)
-                        target_lba = start_lba + current_offset
+                        
+                        is_sparse = is_file_sparse(clean_file)
+                        
+                        if is_sparse:
+                            target_lba = start_lba
+                        else:
+                            target_lba = start_lba + current_offset
 
                         if target_lba + fblks - 1 > end_lba:
                             log_error(f"[{target_id}] {fname} overflows {name}")
                             continue
 
-                        log_info(f"[{target_id}] Flashing {fname} -> {name} (Type: 0x{itype:X}, Size: {fsize_mb:.2f} MB)")
+                        log_info(f"[{target_id}] Flashing {fname} in {name}")
                         time.sleep(0.1)
 
                         use_chunked = fsize_mb > LARGE_FILE_THRESHOLD_MB
@@ -857,22 +898,20 @@ def do_emmc(args):
                         send_emmc_cmd_manual(dev, 2, 0, 0, delay_sec=0.1)
 
                         if use_chunked:
-                            log_info(f"  Using CHUNKED mode (file > {LARGE_FILE_THRESHOLD_MB}MB) with {CHUNK_SIZE_MB}MB Chunks")
-                            written = op_upload_and_flash_chunked(dev, clean_file, target_lba, itype, CHUNK_SIZE_MB)
+                            written = op_upload_and_flash_chunked(dev, clean_file, target_lba, size_lbas, itype, CHUNK_SIZE_MB)
 
                             if not written:
                                 log_error(f"[{target_id}] Chunked flash failed")
                                 return
 
                             written_blocks = fblks if written is True else int(written)
-                            log_info(f"[{target_id}] Chunked flash complete.")
                             current_offset += written_blocks
                         else:
                             if op_upload_file(dev, clean_file, ADDR_AC_LOAD, itype):
-                                send_emmc_cmd_manual(dev, 5, target_lba, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) # ERASE (Redundant but safe)
-                                send_emmc_cmd_manual(dev, 4, target_lba, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) # WRITE
-                                send_emmc_cmd_manual(dev, 3, target_lba, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) # READ
-                                log_info(f"[{target_id}] Flashed.")
+                                if not is_sparse:
+                                    send_emmc_cmd_manual(dev, 5, target_lba, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1)
+                                send_emmc_cmd_manual(dev, 4, target_lba, fblks, param3=size_lbas, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1)
+
                                 current_offset += fblks
                             else:
                                 log_error(f"[{target_id}] Upload failed for {fname}")
@@ -886,7 +925,9 @@ def do_emmc(args):
 
 def update_sm_image(args):
     clean_file = resolve_file_path(args.sm_image)
-    # EMMC usually happens after A-Core is running or in SM mode
+    if not clean_file:
+        log_error(f"SM image file not found: {args.sm_image}")
+        return False
     cdc_port = args.port
     if not cdc_port:
         cdc_port = auto_detect_usb_cdc_port(vid_pid_pairs=usb_cdc_port_default[USB_CDC_SM])
@@ -902,9 +943,9 @@ def update_sm_image(args):
     itype = IMG_TYPE_SM
 
     with DeviceHandler(cdc_port, args.baud, raw_mode=False) as dev:
-        send_emmc_cmd_manual(dev, 0, 0, 0, delay_sec=0.1)   # INIT
-        send_emmc_cmd_manual(dev, 2, 0, 0, delay_sec=0.1)   # SWITCH to user
-        # Normal upload for smaller files
+        log_info("Uploading sysmgr.subimg.gz")
+        send_emmc_cmd_manual(dev, 0, 0, 0, delay_sec=0.1)
+        send_emmc_cmd_manual(dev, 2, 0, 0, delay_sec=0.1)
         if op_upload_file(dev, clean_file, ADDR_AC_LOAD, itype):
             send_emmc_cmd_manual(dev, 5, target_lba, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) # ERASE
             send_emmc_cmd_manual(dev, 4, target_lba, fblks, timeout=EMMC_OP_TIMEOUT, delay_sec=0.1) # WRITE
@@ -915,12 +956,28 @@ def update_sm_image(args):
             log_error(f"Upload failed")
             return False
 
+def resolve_ddr_file_path(filename, ddr_type):
+    """Resolve file path based on DDR type. Looks in DDR-specific folders first, then current directory."""
+    if not ddr_type:
+        return filename
+
+    folder_name = ddr_type.lower()
+    
+    # Try to find file in DDR-specific folder
+    ddr_path = os.path.join(folder_name, filename)
+    if os.path.exists(ddr_path):
+        return ddr_path
+    
+    # Fall back to current directory
+    return filename
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--op", required=True, choices=["version-bl", "version-sm", "run-spk", "run-sm", "run-acore", "emmc", "emmc-sm"])
     parser.add_argument("--port", help="Serial Port (Leave empty for Auto-Detect)")
     parser.add_argument("--baud", type=int, default=DEFAULT_BAUD)
     parser.add_argument("--img-dir", help="Directory for eMMC images")
+    parser.add_argument("--ddr-type", choices=["ddr3", "ddr4", "ddr4x16", "lpddr4"], default="ddr4", help="DDR memory type (auto-selects files from respective folders)")
 
     parser.add_argument("--spk", default="spk.bin", help="SynaPROT SPK image file")
     parser.add_argument("--keys", default="key.bin", help="SynaPROT keys file")
@@ -932,6 +989,14 @@ def main():
     parser.add_argument("--sm-image", nargs='?', const=USE_DEFAULT, help="SysMgr Path to Flash")
     
     args = parser.parse_args()
+    
+    # Apply DDR type path resolution if specified
+    if args.ddr_type:
+        args.m52bl = resolve_ddr_file_path(args.m52bl, args.ddr_type)
+        args.sm = resolve_ddr_file_path(args.sm if args.sm else "sysmgr.subimg", args.ddr_type)
+        args.bl = resolve_ddr_file_path(args.bl if args.bl else "bl.subimg", args.ddr_type)
+        args.tzk = resolve_ddr_file_path(args.tzk if args.tzk else "tzk.subimg", args.ddr_type)
+        args.sm_image = resolve_ddr_file_path(args.sm_image if args.sm_image else "sysmgr.subimg", args.ddr_type)
 
     if args.op == "run-spk":
         do_run_spk(args)
@@ -956,6 +1021,10 @@ def main():
         time.sleep(2)
         do_run_acore(args)
     elif args.op == "emmc": 
+        do_run_spk(args)
+        time.sleep(2)
+        do_run_sm(args)
+        time.sleep(2)
         do_emmc(args)
     elif args.op == "emmc-sm":
         do_run_spk(args)
