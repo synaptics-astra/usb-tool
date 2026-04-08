@@ -2,6 +2,10 @@
 
 This guide describes how to use the USB Boot Tool CLI to load bootloader, System Manager, and A-Core images, as well as flash eMMC partitions onto the sl2610 device.
 
+> [!IMPORTANT]
+> This tool is only for SL261x.
+> For SL16x0 see https://github.com/synaptics-astra/usb-tool/tree/main.
+
 ---
 
 ## Table of Contents
