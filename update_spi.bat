@@ -5,6 +5,7 @@ setlocal
 set "SL1620=sl1620"
 set "SL1640=sl1640"
 set "SL1680=sl1680"
+set "SL2610=sl261x"
 
 :: Check for existence of directories
 if exist "%SL1620%" (
@@ -16,6 +17,9 @@ if exist "%SL1620%" (
 ) else if exist "%SL1680%" (
     echo SL1680 SPI image exists...
     .\bin\win\astra-update -f "%SL1680%"
+) else if exist "%SL2610%" (
+    echo SL2610 SPI image exists...
+    .\bin\win\astra-update -f "%SL2610%"
 ) else (
     echo No SPI images detected. Download an image from https://github.com/synaptics-astra/spi-u-boot
 )

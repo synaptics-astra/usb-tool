@@ -22,6 +22,8 @@ elif [ -d "sl1640" ]; then
     SPI_IMAGE_PATH="sl1640";
 elif [ -d "sl1620" ]; then
     SPI_IMAGE_PATH="sl1620"
+elif [ -d "sl261x" ]; then
+    SPI_IMAGE_PATH="sl261x"
 fi
 
 if [ -n "${SPI_IMAGE_PATH}" ]; then

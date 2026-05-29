@@ -1,0 +1,18 @@
+id: 2990fd38-5a44-11f1-b4b3-e03f491713d5
+chip: sl2610
+board: rdk
+secure_boot: genx
+vendor_id: 06CB
+product_id: 019E
+sysmgr_vendor_id: CAFE
+sysmgr_product_id: 4002
+fastboot_vendor_id: 18D1
+fastboot_product_id: 4EE0
+console: uart
+uenv_support: true
+nand_support: false
+transport: usb_cdc
+memory_layout: 2gb
+ddr_type: ddr4
+uboot: suboot
+uboot_version: "U-Boot 2025.01.202605151605 (May 15 2026 - 09:13:34 +0000)"
