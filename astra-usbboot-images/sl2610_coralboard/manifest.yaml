@@ -1,5 +1,5 @@
 id: 35ac1aea-5f76-11f1-a1dd-00155dd97baa
-chip: sl2610
+chip: sl2619
 board: coralboard
 secure_boot: genx
 vendor_id: 06CB
