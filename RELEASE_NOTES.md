@@ -1,5 +1,11 @@
 # Astra Update Release Notes
 
+## v1.1.0
+
+* Improve error handling and optimize libusb calls
+
+  https://github.com/synaptics-astra/astra-update/releases/tag/v1.1.0
+
 ## v1.0.6
 
 * Fix incorrectly reporting an error when the final operation is erase or format
