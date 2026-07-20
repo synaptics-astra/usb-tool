@@ -1,5 +1,32 @@
 # Astra Update Release Notes
 
+## v2.0.2
+
+* Add support for SL2610 to generate_boot_manifest.py
+* Print out which boot image was selected in AstraDeviceManager::Update()
+* Add support for 512MB memory layouts
+
+  https://github.com/synaptics-astra/astra-update/releases/tag/v2.0.2
+
+## v2.0.1
+
+* Coralboard and SPI Flash Improvements
+
+  https://github.com/synaptics-astra/astra-update/releases/tag/v2.0.1
+
+## v2.0.0
+
+* Fix errors found when compiling with newer versions of GCC
+* Add SL26XX (SL261x) device support with CDC transport and eMMC update
+
+  https://github.com/synaptics-astra/astra-update/releases/tag/v2.0.0
+
+## v1.1.0
+
+* Improve error handling and optimize libusb calls
+
+  https://github.com/synaptics-astra/astra-update/releases/tag/v1.1.0
+
 ## v1.0.6
 
 * Fix incorrectly reporting an error when the final operation is erase or format
