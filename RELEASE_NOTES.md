@@ -1,5 +1,10 @@
 # Astra Update Release Notes
 
+## v2.0.3
+
+* Fix order of image file and address in NAND flash command
+* Support U-Boot 2025 commands with SL16x0
+
 ## v2.0.2
 
 * Add support for SL2610 to generate_boot_manifest.py
