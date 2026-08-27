@@ -1,4 +1,4 @@
-id: b4904856-375c-11f0-879e-0242ac110002
+id: d9be45cc-8b86-11f1-be00-0242ac110002
 chip: sl1640
 board: rdk
 secure_boot: genx
@@ -9,4 +9,4 @@ uenv_support: true
 memory_layout: 2gb
 ddr_type: lpddr4
 uboot: suboot
-uboot_version: "U-Boot 2019.10.202505221539_202505221945-g1581c16241-dirty (May 21 2025 - 15:54:17 +0000)"
+uboot_version: "U-Boot 2025.01.202607240405_202607292043-g13da5d601156 (Jul 23 2026 - 01:40:52 +0000)"
