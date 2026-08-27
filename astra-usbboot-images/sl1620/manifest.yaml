@@ -1,4 +1,4 @@
-id: 755d8e8c-375c-11f0-8773-0242ac110002
+id: bdbb84be-8b83-11f1-aad4-0242ac110002
 chip: sl1620
 board: rdk
 secure_boot: genx
@@ -9,4 +9,4 @@ uenv_support: true
 memory_layout: 2gb
 ddr_type: ddr4
 uboot: suboot
-uboot_version: "U-Boot 2019.10.202505221539_202505221945-g1581c16241-dirty (May 21 2025 - 15:54:17 +0000)"
+uboot_version: "U-Boot 2025.01.202607240405_202607292043-g13da5d601156 (Jul 23 2026 - 01:40:52 +0000)"

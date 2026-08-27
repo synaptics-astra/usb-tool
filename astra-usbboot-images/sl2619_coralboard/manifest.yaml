@@ -1,18 +1,18 @@
-id: 35ac1aea-5f76-11f1-a1dd-00155dd97baa
+id: 810563ae-9d04-11f1-9b3f-0242ac110002
 chip: sl2619
 board: coralboard
 secure_boot: genx
 vendor_id: 06CB
 product_id: 019E
+console: uart
+uenv_support: true
+memory_layout: 2gb
+ddr_type: ddr4x16
+uboot: suboot
+uboot_version: "U-Boot 2025.01-g13da5d601156 (Jul 23 2026 - 01:40:52 +0000)"
 sysmgr_vendor_id: CAFE
 sysmgr_product_id: 4002
 fastboot_vendor_id: 18D1
 fastboot_product_id: 4EE0
-console: uart
-uenv_support: true
 nand_support: false
 transport: usb_cdc
-memory_layout: 2gb
-ddr_type: ddr4x16
-uboot: suboot
-uboot_version: "U-Boot 2025.01.202605151605 (May 15 2026 - 09:13:34 +0000)"
