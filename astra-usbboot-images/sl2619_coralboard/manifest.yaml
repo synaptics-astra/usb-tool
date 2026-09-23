@@ -1,4 +1,4 @@
-id: 624098a0-b4c2-11f1-90c2-0242ac110002
+id: 946fa7d8-b785-11f1-a500-ce9a0a89996d
 chip: sl2619
 board: coralboard
 secure_boot: genx
@@ -9,7 +9,7 @@ uenv_support: true
 memory_layout: 2gb
 ddr_type: ddr4x16
 uboot: suboot
-uboot_version: "U-Boot 2025.01.202609191205_202609192301-ge8b03039809f (Sep 16 2026 - 14:03:12 +0000)"
+uboot_version: "U-Boot 2025.01 (Sep 23 2026 - 19:32:10 +0000)"
 sysmgr_vendor_id: CAFE
 sysmgr_product_id: 4002
 fastboot_vendor_id: 18D1
