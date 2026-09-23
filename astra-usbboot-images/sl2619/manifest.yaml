@@ -1,4 +1,4 @@
-id: c24f0356-8bb1-11f1-a87c-0242ac110002
+id: 5acdced2-b4b1-11f1-9ed9-0242ac110002
 chip: sl2619
 board: rdk
 secure_boot: genx
@@ -9,7 +9,7 @@ uenv_support: true
 memory_layout: 2gb
 ddr_type: ddr4
 uboot: suboot
-uboot_version: "U-Boot 2025.01.202607240405_202607292043-g13da5d601156 (Jul 23 2026 - 01:40:52 +0000)"
+uboot_version: "U-Boot 2025.01.202609191205_202609192301-ge8b03039809f (Sep 16 2026 - 14:03:12 +0000)"
 sysmgr_vendor_id: CAFE
 sysmgr_product_id: 4002
 fastboot_vendor_id: 18D1
