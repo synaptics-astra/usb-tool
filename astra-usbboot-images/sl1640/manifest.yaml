@@ -1,4 +1,4 @@
-id: fe2f210a-b8a5-11f1-92ba-0242ac110002
+id: 333c5686-bc4f-11f1-bab8-0242ac110002
 chip: sl1640
 board: rdk
 secure_boot: genx
@@ -9,4 +9,4 @@ uenv_support: true
 memory_layout: 2gb
 ddr_type: lpddr4
 uboot: suboot
-uboot_version: "U-Boot 2025.01.202609241606_202609242301-ge8b03039809f (Sep 16 2026 - 14:03:12 +0000)"
+uboot_version: "U-Boot 2025.01.202609241606_202609292108-ge8b03039809f (Sep 16 2026 - 14:03:12 +0000)"

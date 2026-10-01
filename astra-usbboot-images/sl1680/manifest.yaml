@@ -1,4 +1,4 @@
-id: 1037f416-b8a2-11f1-a577-0242ac110002
+id: a3b91816-bc33-11f1-a434-0242ac110002
 chip: sl1680
 board: rdk
 secure_boot: genx
@@ -9,4 +9,4 @@ uenv_support: true
 memory_layout: 4gb
 ddr_type: lpddr4x
 uboot: suboot
-uboot_version: "U-Boot 2025.01.202609241606_202609242301-ge8b03039809f (Sep 16 2026 - 14:03:12 +0000)"
+uboot_version: "U-Boot 2025.01.202609241606_202609292108-ge8b03039809f (Sep 16 2026 - 14:03:12 +0000)"
