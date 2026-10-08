@@ -1,9 +1,23 @@
 # Astra Update Release Notes
 
+## v2.0.4
+
+* Support MB layouts in the generate_boot_manifest.py script
+* Fixes based on a review using Fable 5
+* Add option to continue handling image requests after boot in astra-boot
+* Report Update Complete only after the image has been written to the device
+* update: fix issue on MACOS to update SL16xx and SL26xx board
+* Scope libusb pipe2 override to macOS
+* Fix SL261x device specific tmp directory
+
+  https://github.com/synaptics-astra/astra-update/releases/tag/v2.0.4
+
 ## v2.0.3
 
 * Fix order of image file and address in NAND flash command
 * Support U-Boot 2025 commands with SL16x0
+
+  https://github.com/synaptics-astra/astra-update/releases/tag/v2.0.3
 
 ## v2.0.2
 
