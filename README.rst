@@ -6,8 +6,11 @@ This repository contains the USB tools and drivers needed to flash images to the
 USB Driver
 ----------
 
-The ``Synaptics_WinUSB_Driver`` directory contains the Windows USB driver which is needed to communicate with a Synaptics Astra RDK board from a host PC using the USB interface.
-Instructions for installing the USB driver can be found in the `Synaptics Astra Documentation <https://synaptics-astra.github.io/doc/v/1.6.0/linux/index.html#installing-the-winusb-driver-windows-only>`__.
+The ``Synaptics_WinUSB_Driver`` directory contains the Windows USB driver which is needed to communicate with a Synaptics Astra SL16x0 RDK board from a host PC using the USB interface.
+Instructions for installing the USB driver can be found in the `Synaptics Astra Documentation <https://synaptics-astra.github.io/doc/v/latest/linux/index.html#installing-winusb-for-sl16x0-on-windows>`__.
+
+SL261x requires the ``Google USB Driver`` to communicate with a Synaptics Astra SL261x RDK board from a host PC using the USB interface.
+Instructions for installing the USB driver can be found in the `Synaptics Astra Documentation <https://synaptics-astra.github.io/doc/v/latest/linux/index.html#installing-the-google-usb-driver-for-sl2610-on-windows>`__.
 
 Astra Update
 ------------
