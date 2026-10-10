@@ -1,5 +1,5 @@
 id: 2990fd38-5a44-11f1-b4b3-e03f491713d5
-chip: sl2610
+chip: sl2619
 board: rdk
 secure_boot: genx
 vendor_id: 06CB
