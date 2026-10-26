@@ -3,10 +3,8 @@ Synaptics Astra USB Tools
 
 This repository contains the USB tools and drivers needed to flash images to the Synaptics Astra RDK boards.
 
-.. note::
-
-  The Synaptics Coralboard™ Google I/O Edition requires the `astra-update-v2.0.3 <https://github.com/synaptics-astra/usb-tool/releases/tag/astra-update-v2.0.3>`__
-  version of the`usb-tool in order to boot. Newer versions of ``usb-tool`` only support the Synaptics Coralboard SL currently available for purchase.
+*Note*: The Synaptics Coralboard™ Google I/O Edition requires the `astra-update-v2.0.3 <https://github.com/synaptics-astra/usb-tool/releases/tag/astra-update-v2.0.3>`__
+version of the usb-tool in order to boot. Newer versions of ``usb-tool`` only support the Synaptics Coralboard SL currently available for purchase.
 
 USB Driver
 ----------
